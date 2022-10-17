@@ -1,11 +1,10 @@
 import os
 import streamlit as st
-import snowflake.connector  #upm package(snowflake-connector-python==2.7.0)
- 
+import snowflake.connector
  
 # Initialize connection, using st.experimental_singleton to only run once.
 @st.experimental_singleton
-def connectToSnowflake(c):
+def init_connection():
     con = snowflake.connector.connect(
         user=os.getenv("USER"),
         password=os.getenv("PASSWORD"),
@@ -14,6 +13,7 @@ def connectToSnowflake(c):
         warehouse=os.getenv("WAREHOUSE"),
     )
     return con
+
 
 st.title("📃 Dunder Mifflin")
 st.header("Employee Satisfaction Survey")
@@ -43,10 +43,7 @@ elif 'first_name' in st.session_state and 'last_name'  in st.session_state:
     st.subheader('Please rate the following statements on a scale from 1 to 5, with 1 being "strongly disagree" and 5 being "strongly agree."')
 
     with st.form("step-2-form"):
-        # st.image("WLB.jpg",width=500)   
         satisfaction_wlb = st.slider('I have great work-life balance at Dunder Mifflin.', 1, 10, key="satisfaction-wlb")
-        # st.write("\n")
-        # st.image("Birthday.jpg",width=500)
         satisfaction_culture = st.slider("I enjoy Dunder Mifflin's company culture.", 1, 10, key="satisfaction-culture")
         
         if department=="Sales":
@@ -60,14 +57,7 @@ elif 'first_name' in st.session_state and 'last_name'  in st.session_state:
         step_2_submit = st.form_submit_button("Submit")
 
     if step_2_submit:
-        conn = connectToSnowflake({
-            "USER": USER, 
-            "PASSWORD": PASSWORD, 
-            "ACCOUNT": ACCOUNT,
-            "ROLE": ROLE,
-            "WAREHOUSE": WAREHOUSE,
-        })
-
+        conn = init_connection()
         first_name = st.session_state['first_name']
         last_name = st.session_state['last_name']
         cur = conn.cursor()
