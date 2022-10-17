@@ -1,3 +1,2 @@
-os
 streamlit
-snowflake.connector
+snowflake-connector-python
